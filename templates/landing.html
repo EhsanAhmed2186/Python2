@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Haranogiyeche{% endblock %}
+
+{% block content %}
+<section class="hero-gradient p-4 p-md-5 mb-5 text-center shadow-sm">
+  <div class="py-4">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-body shadow-sm border mb-3 small text-primary fw-semibold">
+      <i class="bi bi-stars"></i> Secure Community Lost &amp; Found
+    </div>
+    <h1 class="display-5 fw-bold mb-3">Never Lose Track Again</h1>
+    <p class="lead mx-auto text-muted mb-4" style="max-width: 620px;">
+      A verified lost &amp; found network for universities, organizations, and neighborhoods.
+      Report items, verify ownership securely, and reconnect in confidence.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <a href="{% url 'community_list' %}" class="btn btn-primary btn-lg shadow-sm">
+        <i class="bi bi-compass"></i> Browse communities
+      </a>
+      <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary btn-lg">
+        <i class="bi bi-person-plus"></i> Create an Account
+      </a>
+    </div>
+    <p class="mt-3 mb-0 small text-muted">
+      Already a member? <a href="{% url 'accounts:login' %}" class="fw-semibold">Log in here</a>
+    </p>
+  </div>
+</section>
+
+<div class="row g-4 mb-5">
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm border-0 p-3 text-center">
+      <div class="card-body">
+        <div class="feature-icon-badge bg-primary-subtle text-primary mx-auto">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <h2 class="h5 fw-bold">1. Join Privately</h2>
+        <p class="text-muted small mb-0">
+          Browse public directories or join trusted communities using access codes provided by verified administrators.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm border-0 p-3 text-center">
+      <div class="card-body">
+        <div class="feature-icon-badge bg-success-subtle text-success mx-auto">
+          <i class="bi bi-camera-fill"></i>
+        </div>
+        <h2 class="h5 fw-bold">2. Post Lost &amp; Found</h2>
+        <p class="text-muted small mb-0">
+          Upload pictures and clear descriptions of missing or discovered belongings to alert members immediately.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm border-0 p-3 text-center">
+      <div class="card-body">
+        <div class="feature-icon-badge bg-info-subtle text-info mx-auto">
+          <i class="bi bi-chat-heart-fill"></i>
+        </div>
+        <h2 class="h5 fw-bold">3. Verify &amp; Handover</h2>
+        <p class="text-muted small mb-0">
+          Owners ask custom security questions. Direct chat unlocks exclusively after answers are approved.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if featured %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0 fw-bold">Featured Communities</h2>
+    <a href="{% url 'community_list' %}" class="small text-primary fw-semibold text-decoration-none">
+      View all <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  <div class="list-group shadow-sm mb-4">
+    {% for community in featured %}
+      <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar-circle avatar-circle-sm">{{ community.name|slice:":1" }}</div>
+          <span class="fw-semibold">{{ community.name }}</span>
+        </div>
+        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+          <i class="bi bi-people-fill me-1"></i> {{ community.member_count }} member{{ community.member_count|pluralize }}
+        </span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

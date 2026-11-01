@@ -1,0 +1,159 @@
+/* Haranogiyeche shared styles. Keep all custom CSS here so pages stay consistent.
+   Colours use Bootstrap's theme variables (--bs-*) so light and dark mode both work. */
+
+:root {
+  --brand: #1f5f8b;
+  --brand-nav: #1f5f8b;
+  --brand-soft: #eef5fb;
+}
+
+[data-bs-theme="dark"] {
+  --brand-nav: #17435f;
+  --brand-soft: #1c2b39;
+}
+
+/* ---- layout ---- */
+main {
+  flex: 1;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.bg-brand {
+  background-color: var(--brand-nav) !important;
+}
+
+.navbar .badge {
+  vertical-align: middle;
+}
+
+.navbar .nav-link.active {
+  font-weight: 600;
+}
+
+/* ---- cards ---- */
+.card.h-100.shadow-sm {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+a:hover > .card.h-100.shadow-sm {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+/* ---- notifications ---- */
+.notif-unread {
+  background-color: var(--brand-soft);
+  font-weight: 600;
+}
+
+/* ---- chat ---- */
+.chat-box {
+  max-height: 55vh;
+  min-height: 160px;
+  overflow-y: auto;
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.chat-row {
+  display: flex;
+  margin-bottom: 0.6rem;
+}
+
+.chat-row.mine {
+  justify-content: flex-end;
+}
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 0.5rem 0.8rem;
+  border-radius: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.chat-row.mine .chat-bubble {
+  background: var(--brand);
+  color: #fff;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.chat-row.theirs .chat-bubble {
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border: 1px solid var(--bs-border-color);
+  border-bottom-left-radius: 0.25rem;
+}
+
+.chat-meta {
+  font-size: 0.72rem;
+  opacity: 0.75;
+  margin-top: 0.15rem;
+}
+
+.chat-system {
+  text-align: center;
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+/* ---- small screens ---- */
+@media (max-width: 576px) {
+  .chat-bubble {
+    max-width: 90%;
+  }
+}
+/* Keep uploaded photos within their feed and detail layouts. */
+.post-card-img-wrap {
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  background: var(--bs-tertiary-bg);
+}
+
+.post-card-img-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.post-detail-img-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-height: 440px;
+  overflow: hidden;
+  background: var(--bs-tertiary-bg);
+}
+
+.post-detail-img-wrap img {
+  display: block;
+  max-width: 100%;
+  max-height: 440px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+img.avatar-circle {
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+img.avatar-circle-sm {
+  width: 32px;
+  height: 32px;
+  flex-basis: 32px;
+}

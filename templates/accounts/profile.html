@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}'s profile photo"
+                 class="avatar-circle">
+          {% else %}
+            <span class="avatar-circle">{{ user.username|slice:":1"|upper }}</span>
+          {% endif %}
+          <h1 class="h4 mb-0">{{ user.username }}</h1>
+        </div>
+
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Email</dt>
+          <dd class="col-sm-8">{{ user.email }}</dd>
+          <dt class="col-sm-4">Member since</dt>
+          <dd class="col-sm-8">{{ user.date_joined|date:"M d, Y" }}</dd>
+          <dt class="col-sm-4">Communities</dt>
+          <dd class="col-sm-8">{{ memberships|length }}</dd>
+          <dt class="col-sm-4">Posts</dt>
+          <dd class="col-sm-8">{{ post_count }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h2 class="h5">Profile photo</h2>
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          {% include "includes/form_fields.html" with form=form %}
+          <button type="submit" class="btn btn-primary">Upload photo</button>
+        </form>
+
+        {% if user.avatar %}
+          <form method="post" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" name="remove_avatar" value="1"
+                    class="btn btn-outline-danger">Remove photo</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <h2 class="h5">My communities</h2>
+    <div class="list-group">
+      {% for membership in memberships %}
+        <a href="{% url 'accounts:community_detail' membership.community.pk %}"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+          <span>{{ membership.community.name }}</span>
+          <span class="badge text-bg-secondary">{{ membership.get_role_display }}</span>
+        </a>
+      {% empty %}
+        <div class="list-group-item text-muted">You have not joined any community yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

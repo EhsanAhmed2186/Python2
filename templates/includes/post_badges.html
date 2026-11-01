@@ -1,0 +1,14 @@
+{# Shared badges with high-contrast icons #}
+{% if post.type == 'lost' %}
+  <span class="badge badge-lost"><i class="bi bi-search"></i> {{ post.get_type_display }}</span>
+{% else %}
+  <span class="badge badge-found"><i class="bi bi-check2-circle"></i> {{ post.get_type_display }}</span>
+{% endif %}
+
+{% if post.status == 'active' %}
+  <span class="badge badge-status-active"><i class="bi bi-broadcast"></i> {{ post.get_status_display }}</span>
+{% elif post.status == 'returned' %}
+  <span class="badge badge-status-returned"><i class="bi bi-check-all"></i> {{ post.get_status_display }}</span>
+{% else %}
+  <span class="badge badge-status-other">{{ post.get_status_display }}</span>
+{% endif %}

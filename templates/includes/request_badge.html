@@ -1,0 +1,8 @@
+{# Usage: {% include "includes/request_badge.html" with contact=contact %} #}
+{% if contact.status == 'approved' %}
+  <span class="badge badge-found"><i class="bi bi-check-circle-fill"></i> {{ contact.get_status_display }}</span>
+{% elif contact.status == 'rejected' %}
+  <span class="badge badge-lost"><i class="bi bi-x-circle-fill"></i> {{ contact.get_status_display }}</span>
+{% else %}
+  <span class="badge badge-status-active"><i class="bi bi-clock-history"></i> {{ contact.get_status_display }}</span>
+{% endif %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Communities{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0">Communities</h1>
+  {% if user.is_authenticated %}
+    <a href="{% url 'accounts:create_community' %}" class="btn btn-primary">Create a community</a>
+  {% endif %}
+</div>
+
+<p class="text-muted">
+  Anyone can browse this list. To join a community you need an account and its join code,
+  which a community admin gives you. Posts and members are visible to members only.
+</p>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-sm-9">
+    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search communities" aria-label="Search communities">
+  </div>
+  <div class="col-sm-3 d-grid">
+    <button type="submit" class="btn btn-outline-primary">Search</button>
+  </div>
+</form>
+
+<div class="list-group">
+  {% for community in communities %}
+    <div class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <div class="fw-semibold">{{ community.name }}</div>
+        <div class="small text-muted">{{ community.member_count }} member{{ community.member_count|pluralize }}</div>
+      </div>
+      <div>
+        {% if not user.is_authenticated %}
+          <a href="{% url 'accounts:register' %}?next={% url 'accounts:join_community' %}" class="btn btn-primary btn-sm">Register to join</a>
+          <a href="{% url 'accounts:login' %}?next={% url 'accounts:join_community' %}" class="btn btn-outline-secondary btn-sm">Log in</a>
+        {% elif community.is_member %}
+          <a href="{% url 'accounts:community_detail' community.pk %}" class="btn btn-outline-primary btn-sm">Open</a>
+        {% else %}
+          <a href="{% url 'accounts:join_community' %}" class="btn btn-primary btn-sm">Join with code</a>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="list-group-item text-center text-muted p-5">
+      {% if query %}No communities match your search.{% else %}No communities yet.{% endif %}
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

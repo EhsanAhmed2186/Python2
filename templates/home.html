@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}My Communities{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+  <h1 class="h3 mb-0">My Communities</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'accounts:join_community' %}" class="btn btn-outline-primary">Join a community</a>
+    <a href="{% url 'accounts:create_community' %}" class="btn btn-primary">Create a community</a>
+  </div>
+</div>
+
+{% if memberships %}
+  <div class="list-group">
+    {% for membership in memberships %}
+      <a href="{% url 'accounts:community_detail' membership.community.pk %}"
+         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <span>{{ membership.community.name }}</span>
+        <span class="badge text-bg-secondary">{{ membership.get_role_display }}</span>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center text-muted border rounded p-5">
+    <p class="mb-3">You haven't joined any communities yet.</p>
+    <a href="{% url 'accounts:join_community' %}" class="btn btn-outline-primary me-2">Join a community</a>
+    <a href="{% url 'accounts:create_community' %}" class="btn btn-primary">Create a community</a>
+  </div>
+{% endif %}
+{% endblock %}

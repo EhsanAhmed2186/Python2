@@ -1,0 +1,47 @@
+HOW TO EDIT config/settings.py  (do NOT replace the whole file)
+==============================================================
+
+1) Near the top, under the other imports, add:
+
+from django.contrib.messages import constants as message_constants
+
+
+2) Make sure INSTALLED_APPS contains all of these (keep Django's default ones):
+
+    "accounts",
+    "newsfeed",
+    "verification",
+    "messaging",
+    "notifications",
+
+
+3) In the TEMPLATES setting:
+
+   a) change  "DIRS": [],  to:
+
+        "DIRS": [BASE_DIR / "templates"],
+
+   b) add ONE line to the end of the existing "context_processors" list
+      (this feeds the unread counters in the navbar):
+
+                "notifications.context_processors.unread_counts",
+
+
+4) At the very bottom of the file, add:
+
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "accounts:login"
+
+# Makes Django's "error" messages use Bootstrap's "danger" alert colour.
+MESSAGE_TAGS = {message_constants.ERROR: "danger"}
+
+
+5) Check this already exists (it should):
+
+AUTH_USER_MODEL = "accounts.User"

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ community.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0">{{ community.name }}</h1>
+  <span class="badge text-bg-secondary">Your role: {{ membership.get_role_display }}</span>
+</div>
+
+{% if is_admin %}
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h6">Join code</h2>
+      <p class="text-muted small mb-2">Share this code with people you want to invite.</p>
+      <div class="input-group" style="max-width: 320px;">
+        <input type="text" id="joinCode" class="form-control" value="{{ community.join_code }}" readonly>
+        <button type="button" class="btn btn-outline-secondary" id="copyJoinCode">Copy</button>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<div class="card mb-4">
+  <div class="card-header">Members ({{ members|length }})</div>
+  <ul class="list-group list-group-flush">
+    {% for member in members %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ member.user.username }}</span>
+        <span class="badge text-bg-secondary">{{ member.get_role_display }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<a href="{% url 'newsfeed:feed' community.pk %}" class="btn btn-primary mb-3">Open the Lost &amp; Found feed</a><br>
+<a href="{% url 'home' %}">&larr; Back to my communities</a>
+{% endblock %}
+
+{% block extra_js %}
+{% if is_admin %}
+<script>
+  document.getElementById("copyJoinCode").addEventListener("click", function () {
+    var input = document.getElementById("joinCode");
+    input.select();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(input.value);
+    } else {
+      document.execCommand("copy");
+    }
+    this.textContent = "Copied";
+  });
+</script>
+{% endif %}
+{% endblock %}
