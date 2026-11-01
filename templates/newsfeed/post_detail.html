@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.get_type_display }} post | Haranogiyeche{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <a href="{% url 'newsfeed:feed' community.pk %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i> Back to {{ community.name }} feed
+  </a>
+</div>
+
+<div class="card shadow-sm mb-4 border">
+  {% if post.image %}
+    <div class="post-detail-img-wrap border-bottom">
+      <img src="{% url 'newsfeed:post_image' post.pk %}" alt="Item photo">
+    </div>
+  {% endif %}
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+      <div class="d-flex flex-wrap gap-2">
+        {% include "includes/post_badges.html" with post=post %}
+      </div>
+      <div class="text-muted small d-flex align-items-center gap-2">
+        <span class="avatar-circle avatar-circle-sm">{{ post.user.username|slice:":1" }}</span>
+        <span>Posted by <strong>{{ post.user.username }}</strong> on {{ post.created_at|date:"M d, Y H:i" }}</span>
+      </div>
+    </div>
+
+    <div class="fs-5 mb-4 p-3 bg-body-tertiary rounded-3 lh-base">
+      {{ post.caption|linebreaks }}
+    </div>
+
+    <!-- Call to Actions -->
+    <div class="d-flex flex-wrap gap-2 pt-2">
+      {% if is_author %}
+        <a href="{% url 'newsfeed:post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-pencil-square"></i> Edit Post
+        </a>
+        <a href="{% url 'verification:manage_questions' post.pk %}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-patch-question"></i> Verification Questions
+        </a>
+        <a href="{% url 'verification:my_requests' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-inbox"></i> Claim Requests
+        </a>
+      {% else %}
+        {% if post.status == 'active' %}
+          <a href="{% url 'verification:claim' post.pk %}" class="btn btn-success">
+            <i class="bi bi-hand-index-thumb"></i>
+            {% if post.type == 'found' %}This is mine (Claim){% else %}I found this item!{% endif %}
+          </a>
+        {% endif %}
+      {% endif %}
+      {% if can_report %}
+        <a href="{% url 'newsfeed:report_create' post.pk %}" class="btn btn-outline-danger btn-sm ms-auto">
+          <i class="bi bi-flag"></i> Report
+        </a>
+      {% endif %}
+    </div>
+
+    {% if can_manage %}
+      <hr class="my-4">
+      <form method="post" action="{% url 'newsfeed:post_status' post.pk %}" class="row g-2 align-items-center">
+        {% csrf_token %}
+        <div class="col-auto">
+          <label for="{{ status_form.status.id_for_label }}" class="col-form-label fw-semibold small">
+            <i class="bi bi-arrow-repeat"></i> Update Status:
+          </label>
+        </div>
+        <div class="col-auto">
+          <select name="status" id="{{ status_form.status.id_for_label }}" class="form-select form-select-sm">
+            {% for value, label in status_form.fields.status.choices %}
+              <option value="{{ value }}" {% if post.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-secondary btn-sm">Update</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Comments Section -->
+<div class="card shadow-sm p-4">
+  <h2 class="h5 fw-bold mb-3 d-flex align-items-center gap-2">
+    <i class="bi bi-chat-left-text"></i> Community Comments ({{ comments|length }})
+  </h2>
+
+  <div class="d-flex flex-column gap-2 mb-4">
+    {% for comment in comments %}
+      <div class="p-3 rounded-3 bg-body-tertiary border">
+        <div class="d-flex justify-content-between align-items-center small text-muted mb-1">
+          <div class="d-flex align-items-center gap-2">
+            <span class="avatar-circle avatar-circle-sm">{{ comment.user.username|slice:":1" }}</span>
+            <span class="fw-semibold text-body">{{ comment.user.username }}</span>
+          </div>
+          <span>{{ comment.created_at|timesince }} ago</span>
+        </div>
+        <div class="ps-4">{{ comment.content|linebreaksbr }}</div>
+      </div>
+    {% empty %}
+      <p class="text-muted small mb-0">No public comments yet. Ask a question or leave a note below.</p>
+    {% endfor %}
+  </div>
+
+  <form method="post" action="{% url 'newsfeed:comment_create' post.pk %}" novalidate>
+    {% csrf_token %}
+    {% include "includes/form_fields.html" with form=comment_form %}
+    <button type="submit" class="btn btn-primary btn-sm">
+      <i class="bi bi-send"></i> Post Comment
+    </button>
+  </form>
+</div>
+{% endblock %}

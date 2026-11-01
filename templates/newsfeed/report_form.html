@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Report post{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3">Report this post</h1>
+        <p class="text-muted small">Reports help keep the community safe. Community admins can review them.</p>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "includes/form_fields.html" with form=form %}
+          <button type="submit" class="btn btn-danger w-100">Submit report</button>
+        </form>
+        <p class="text-center mt-3 mb-0"><a href="{% url 'newsfeed:post_detail' post.pk %}">Cancel</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

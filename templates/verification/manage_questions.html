@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Verification questions{% endblock %}
+
+{% block content %}
+<a href="{% url 'newsfeed:post_detail' post.pk %}" class="small">&larr; Back to the post</a>
+<h1 class="h4 mt-2">Verification questions</h1>
+<p class="text-muted">
+  Ask something only the real owner would know. People who contact you answer these,
+  and <strong>you</strong> decide whether to approve them. Never ask for passwords or ID numbers.
+</p>
+
+{% if locked %}
+  <div class="alert alert-info">Questions are locked because someone has already sent a request.</div>
+{% endif %}
+
+<div class="card mb-4">
+  <div class="card-header">Current questions ({{ questions|length }})</div>
+  <ul class="list-group list-group-flush">
+    {% for question in questions %}
+      <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+        <div>
+          {{ question.question }}
+          {% if question.has_expected_answer %}
+            <span class="badge text-bg-success">Expected answer saved</span>
+          {% else %}
+            <span class="badge text-bg-secondary">No expected answer</span>
+          {% endif %}
+        </div>
+        {% if not locked %}
+          <form method="post" action="{% url 'verification:delete_question' question.pk %}"
+                onsubmit="return confirm('Delete this question?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+          </form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li class="list-group-item text-muted">No questions yet. Without questions, you review requests with nothing to compare.</li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% if not locked %}
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="h6">Add a question</h2>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "includes/form_fields.html" with form=form %}
+        <button type="submit" class="btn btn-primary">Add question</button>
+      </form>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

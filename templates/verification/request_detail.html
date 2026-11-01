@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Request{% endblock %}
+
+{% block content %}
+<a href="{% url 'verification:my_requests' %}" class="small">&larr; All requests</a>
+
+<div class="card shadow-sm mt-2 mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <h1 class="h4 mb-0">Contact request</h1>
+      {% include "includes/request_badge.html" with contact=contact %}
+    </div>
+    <dl class="row mt-3 mb-0">
+      <dt class="col-sm-3">Post</dt>
+      <dd class="col-sm-9">
+        <a href="{% url 'newsfeed:post_detail' post.pk %}">{{ post.get_type_display }}: {{ post.caption|truncatechars:80 }}</a>
+      </dd>
+      <dt class="col-sm-3">From</dt>
+      <dd class="col-sm-9">{{ contact.sender.username }}</dd>
+      <dt class="col-sm-3">To</dt>
+      <dd class="col-sm-9">{{ contact.receiver.username }}</dd>
+      <dt class="col-sm-3">Sent</dt>
+      <dd class="col-sm-9">{{ contact.created_at|date:"M d, Y H:i" }}</dd>
+    </dl>
+  </div>
+</div>
+
+{% if can_review %}
+  <div class="card mb-4">
+    <div class="card-header">Answers submitted by the claimant</div>
+    <ul class="list-group list-group-flush">
+      {% for answer in answers %}
+        <li class="list-group-item">
+          <div class="small text-muted">{{ answer.question.question }}</div>
+          <div class="d-flex justify-content-between align-items-center gap-2">
+            <span>{{ answer.answer_text }}</span>
+            {% if answer.matches_expected is True %}
+              <span class="badge text-bg-success">Matches expected answer</span>
+            {% elif answer.matches_expected is False %}
+              <span class="badge text-bg-danger">Does not match</span>
+            {% else %}
+              <span class="badge text-bg-secondary">No expected answer set</span>
+            {% endif %}
+          </div>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-muted">No questions were set for this post.</li>
+      {% endfor %}
+    </ul>
+    <div class="card-footer small text-muted">
+      A matching answer is only a hint, not proof. You decide whether to approve.
+    </div>
+  </div>
+
+  {% if can_decide %}
+    <div class="d-flex gap-2 mb-4">
+      <form method="post" action="{% url 'verification:approve' contact.pk %}"
+            onsubmit="return confirm('Approve this request? Both of you will be able to message each other.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Approve</button>
+      </form>
+      <form method="post" action="{% url 'verification:reject' contact.pk %}"
+            onsubmit="return confirm('Reject this request?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger">Reject</button>
+      </form>
+    </div>
+  {% endif %}
+{% endif %}
+
+{% if is_sender %}
+  {% if contact.status == 'pending' %}
+    <div class="alert alert-warning">The owner has not decided yet. You will get a notification.</div>
+  {% elif contact.status == 'rejected' %}
+    <div class="alert alert-danger">The owner could not verify your claim.</div>
+  {% endif %}
+{% endif %}
+
+{% if can_chat %}
+  <a href="{% url 'messaging:conversation' contact.pk %}" class="btn btn-primary">Open conversation</a>
+{% endif %}
+{% endblock %}

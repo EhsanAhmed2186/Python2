@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ community.name }} Feed{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm p-4 mb-4 border-0">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="avatar-circle">{{ community.name|slice:":1" }}</div>
+      <div>
+        <h1 class="h3 mb-0 fw-bold">{{ community.name }}</h1>
+        <a href="{% url 'accounts:community_detail' community.pk %}" class="small text-muted text-decoration-none">
+          <i class="bi bi-info-circle"></i> View community details
+        </a>
+      </div>
+    </div>
+    <a href="{% url 'newsfeed:post_create' community.pk %}" class="btn btn-primary shadow-sm">
+      <i class="bi bi-plus-circle"></i> Create New Post
+    </a>
+  </div>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card shadow-sm p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-3">
+      <select name="type" class="form-select" aria-label="Filter by type">
+        <option value="">All Types (Lost &amp; Found)</option>
+        {% for value, label in type_choices %}
+          <option value="{{ value }}" {% if post_type == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select name="status" class="form-select" aria-label="Filter by status">
+        <option value="">All Statuses</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <div class="input-group">
+        <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search post descriptions...">
+      </div>
+    </div>
+    <div class="col-md-2 d-grid">
+      <button type="submit" class="btn btn-outline-primary">Filter</button>
+    </div>
+  </form>
+</div>
+
+<!-- Feed Posts -->
+{% if posts %}
+  <div class="row g-4">
+    {% for post in posts %}
+      <div class="col-md-6 col-lg-4">
+        <a href="{% url 'newsfeed:post_detail' post.pk %}" class="text-decoration-none text-reset">
+          <div class="card h-100 shadow-sm border">
+            {% if post.image %}
+              <div class="post-card-img-wrap">
+                <img src="{% url 'newsfeed:post_image' post.pk %}" alt="Item photo">
+              </div>
+            {% endif %}
+            <div class="card-body">
+              <div class="mb-2 d-flex flex-wrap gap-1">
+                {% include "includes/post_badges.html" with post=post %}
+              </div>
+              <p class="card-text text-body" style="min-height: 48px;">
+                {{ post.caption|truncatechars:120 }}
+              </p>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center text-muted small">
+              <div class="d-flex align-items-center gap-2">
+                <span class="avatar-circle avatar-circle-sm">{{ post.user.username|slice:":1" }}</span>
+                <span>{{ post.user.username }}</span>
+              </div>
+              <span><i class="bi bi-clock"></i> {{ post.created_at|timesince }} ago</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state-box">
+    <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+    <h3 class="h5 fw-bold mb-2">No Posts Found</h3>
+    <p class="text-muted small mb-4">No lost or found items match your filter criteria right now.</p>
+    <a href="{% url 'newsfeed:post_create' community.pk %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Create the First Post
+    </a>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Send a request{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <a href="{% url 'newsfeed:post_detail' post.pk %}" class="small">&larr; Back to the post</a>
+    <div class="card shadow-sm mt-2">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-2">Contact the owner</h1>
+        <p class="text-muted small mb-3">
+          {% include "includes/post_badges.html" with post=post %}
+          <span class="ms-1">{{ post.caption|truncatechars:100 }}</span>
+        </p>
+
+        {% if has_questions %}
+          <p>Answer these questions so the owner can check your claim. Only the owner and community moderators can read your answers.</p>
+        {% else %}
+          <p>The owner has not set any questions. Your request will go to the owner for review.</p>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "includes/form_fields.html" with form=form %}
+          <button type="submit" class="btn btn-success w-100">Send request</button>
+        </form>
+        <p class="small text-muted mt-3 mb-0">
+          You can message each other only after the owner approves your request.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
