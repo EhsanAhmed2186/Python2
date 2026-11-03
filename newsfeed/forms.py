@@ -11,8 +11,12 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
 class PostForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["type", "caption", "image"]
-        labels = {"type": "Is the item lost or found?", "caption": "Describe the item"}
+        fields = ["type", "caption", "location", "image"]
+        labels = {
+            "type": "Is the item lost or found?",
+            "caption": "Describe the item",
+            "location": "Where was it lost or found?",
+        }
         widgets = {"caption": forms.Textarea(attrs={"rows": 4})}
 
     def clean_image(self):

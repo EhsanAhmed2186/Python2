@@ -13,10 +13,16 @@ def get_membership(user, community):
     return Membership.objects.filter(user=user, community=community).first()
 
 
+def has_community_access(user, community):
+    return bool(user.is_authenticated and (user.is_superadmin or get_membership(user, community)))
+
+
 def is_member(user, community):
-    return get_membership(user, community) is not None
+    return has_community_access(user, community)
 
 
 def is_community_admin(user, community):
+    if user.is_authenticated and user.is_superadmin:
+        return True
     membership = get_membership(user, community)
     return membership is not None and membership.role == Membership.Role.ADMIN

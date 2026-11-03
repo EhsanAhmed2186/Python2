@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm, UserCreationForm
-from django.core.validators import RegexValidator
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from .models import Community
 
@@ -48,33 +47,6 @@ class JoinCommunityForm(BootstrapFormMixin, forms.Form):
 
     def clean_join_code(self):
         return self.cleaned_data["join_code"].strip().upper()
-
-
-class PasswordResetRequestForm(BootstrapFormMixin, forms.Form):
-    email = forms.EmailField(label="Email address")
-
-    def clean_email(self):
-        return self.cleaned_data["email"].strip().lower()
-
-
-class OTPForm(BootstrapFormMixin, forms.Form):
-    code = forms.CharField(
-        label="6-digit code",
-        max_length=6,
-        validators=[RegexValidator(r"^\d{6}$", "Enter the 6-digit code.")],
-        widget=forms.TextInput(
-            attrs={
-                "inputmode": "numeric",
-                "autocomplete": "one-time-code",
-                "maxlength": "6",
-                "placeholder": "123456",
-            }
-        ),
-    )
-
-
-class ResetPasswordForm(BootstrapFormMixin, SetPasswordForm):
-    """New password + confirmation, checked by Django's password validators."""
 
 
 MAX_AVATAR_SIZE = 2 * 1024 * 1024  # 2 MB

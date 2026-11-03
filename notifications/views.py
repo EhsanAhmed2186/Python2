@@ -53,13 +53,10 @@ def _to_int(value):
 def poll(request):
     """
     Called every few seconds by static/js/live.js. Returns ONLY the logged-in user's
-    own new notifications and new incoming messages (newer than the ids the page
-    already knows), plus fresh counters for the navbar badges.
+    own new notifications and incoming messages newer than the ids the page knows.
     """
     # Imported here so the notifications app stays loosely coupled to the others.
     from messaging.models import Message
-    from verification.models import ContactRequest
-
     user = request.user
     last_notification = _to_int(request.GET.get("n"))
     last_message = _to_int(request.GET.get("m"))
@@ -82,13 +79,6 @@ def poll(request):
             Message.objects.filter(pk__in=visible, receiver=user).update(is_read=True)
 
     data = {
-        "counts": {
-            "notifications": Notification.objects.filter(user=user, is_read=False).count(),
-            "messages": Message.objects.filter(receiver=user, is_read=False).count(),
-            "requests": ContactRequest.objects.filter(
-                receiver=user, status=ContactRequest.Status.PENDING
-            ).count(),
-        },
         "notifications": [
             {
                 "id": n.pk,

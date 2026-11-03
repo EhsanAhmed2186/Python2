@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from accounts.access import get_membership
+from accounts.access import get_membership, has_community_access
 from accounts.models import Membership
 from newsfeed.models import Post
 from notifications.services import notify
@@ -23,7 +23,7 @@ def _post_for_member(user, post_id):
     """Return (post, membership), or raise 403 if the user is not in the post's community."""
     post = get_object_or_404(Post.objects.select_related("community", "user"), pk=post_id)
     membership = get_membership(user, post.community)
-    if membership is None:
+    if not has_community_access(user, post.community):
         raise PermissionDenied
     return post, membership
 
@@ -34,6 +34,8 @@ def _can_review(user, contact):
     admin/moderator. The sender can NEVER review their own request, even if they
     are an admin.
     """
+    if getattr(user, "is_superadmin", False):
+        return True
     if contact.sender_id == user.id:
         return False
     if contact.receiver_id == user.id:
@@ -58,7 +60,7 @@ def _get_request(pk):
 @login_required
 def manage_questions(request, post_id):
     post, _ = _post_for_member(request.user, post_id)
-    if post.user_id != request.user.id:
+    if post.user_id != request.user.id and not request.user.is_superadmin:
         raise PermissionDenied
 
     # Once someone has sent a request, questions are frozen so every claimant faced the same ones.
@@ -94,7 +96,9 @@ def manage_questions(request, post_id):
 def delete_question(request, pk):
     question = get_object_or_404(VerificationQuestion.objects.select_related("post__community"), pk=pk)
     post = question.post
-    if get_membership(request.user, post.community) is None or post.user_id != request.user.id:
+    if not has_community_access(request.user, post.community) or (
+        post.user_id != request.user.id and not request.user.is_superadmin
+    ):
         raise PermissionDenied
 
     if post.contact_requests.exists():
@@ -236,8 +240,14 @@ def reject(request, pk):
 
 @login_required
 def my_requests(request):
+    received = (
+        ContactRequest.objects.select_related("post", "sender", "receiver")
+        if request.user.is_superadmin
+        else request.user.received_requests.select_related("post", "sender")
+    )
     context = {
-        "received": request.user.received_requests.select_related("post", "sender"),
+        "received": received,
         "sent": request.user.sent_requests.select_related("post", "receiver"),
+        "is_superadmin": request.user.is_superadmin,
     }
     return render(request, "verification/request_list.html", context)
